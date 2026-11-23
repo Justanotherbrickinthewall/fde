@@ -1,7 +1,9 @@
 {
   "name": "fde",
   "version": "0.1.0",
-  "description": "The forward deployed engineering method, in two workbooks.",
+  "description": "Claude Code skills that run a forward deployed engineering engagement, from the first client call to a tested delivery.",
+  "keywords": ["forward-deployed-engineering", "sessions", "qa", "testing", "client-delivery"],
+  "homepage": "https://github.com/Justanotherbrickinthewall/fde",
   "author": {
     "name": "People Equation"
   },
