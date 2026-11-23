@@ -1,0 +1,46 @@
+# One model task. Copy this file, name it for the task, and fill it in.
+#
+# The file name without its extension is the task name, and that name is
+# what a caller passes to the gateway. `extract.toml` is the task `extract`.
+# The tasks live in one directory, and the application is told where that
+# directory is at startup. Nothing derives the path from a source file.
+#
+# All three keys are required and none may be empty. There is no default
+# prompt and no default model anywhere in the code, so a missing file or a
+# missing key raises an error that names itself. That is the point: a
+# default here means a call made with a prompt nobody wrote.
+#
+# This file as it stands is deliberately empty, so it will be refused until
+# you fill it in.
+
+# Which model to ask, in the provider's own naming.
+#
+# Put the reason for the choice above the line, as a comment, with a date.
+# A model is swapped for a reason and the next person needs to know it.
+model = ""
+
+# What to ask it. This is sent as the system message.
+#
+# Write it as instructions to a person doing the job. Say what to do when
+# the answer is not in the material: leave the field out, rather than
+# guess at it. A gap on screen is recoverable and an invented value in a
+# signed document is not.
+prompt = """
+"""
+
+# The shape the answer must take, as a JSON Schema object in a string.
+#
+# It is sent to the provider as the response format, and it is what the
+# answer is validated against on the way back. One statement, in one file,
+# so the shape asked for and the shape parsed cannot drift apart.
+#
+# Set `additionalProperties` to false and list `required` in full. A
+# permissive schema is how a partial answer gets through looking complete.
+schema = """
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [],
+  "properties": {}
+}
+"""

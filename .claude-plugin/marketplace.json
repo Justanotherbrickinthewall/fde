@@ -1,0 +1,15 @@
+{
+  "name": "people-equation",
+  "description": "People Equation's Claude Code plugins. One folder per plugin under plugins/, one row here each.",
+  "owner": {
+    "name": "People Equation"
+  },
+  "plugins": [
+    {
+      "name": "fde",
+      "description": "The forward deployed engineering method, in two workbooks.",
+      "source": "./plugins/fde",
+      "version": "0.1.0"
+    }
+  ]
+}

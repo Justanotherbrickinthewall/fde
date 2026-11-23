@@ -1,0 +1,309 @@
+/* Datum: the design language, in one file.
+ *
+ * Every colour, radius, type size, shadow and motion value the frontend may
+ * use is declared here and nowhere else. There is no `tailwind.config.ts`,
+ * because HeroUI reads its theme as CSS custom properties and a JS config
+ * cannot write those. One place is still one place; the place moved.
+ *
+ * `src/__tests__/design-tokens.test.ts` reads this file and checks it
+ * against `../DESIGN.md`, in both directions and in both palettes. The
+ * state colours are also checked for contrast: every one clears 4.5 to 1
+ * against its own soft ground, in both palettes.
+ *
+ * ---- What this language is, and what it stopped being ------------------
+ *
+ * Dark is the default, and it is the palette the language is designed in.
+ * Light is its bright counterpart. Light has to hold up, but it is not
+ * where the decisions get made.
+ *
+ * Corners are square, at a quarter rem. That is a decision, not a
+ * carry-over: sharp corners on a dark, dense ground is what the tools
+ * people sit in all day look like, and this is an instrument somebody
+ * spends a day at a time inside.
+ *
+ * Colour carries exactly one meaning, which is the state of a field.
+ * Nothing else here is saturated. A role, a file type and a key are all
+ * drawn in the neutral, so a person scanning a screen sees state and only
+ * state.
+ */
+
+/* ---- Tailwind's view of the tokens ------------------------------------
+ *
+ * `@theme inline` publishes a token as a utility without copying its value,
+ * so `bg-state-settled` resolves through `--state-settled` and follows the
+ * palette in force. A non-inline `@theme` would freeze one palette's value
+ * into the utility and the other would print the wrong colour.
+ */
+@theme inline {
+  --font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", monospace;
+
+  /* The six field states, each a foreground and a soft ground. */
+  --color-state-open: var(--state-open);
+  --color-state-open-soft: var(--state-open-soft);
+  --color-state-awaiting: var(--state-awaiting);
+  --color-state-awaiting-soft: var(--state-awaiting-soft);
+  --color-state-inferred: var(--state-inferred);
+  --color-state-inferred-soft: var(--state-inferred-soft);
+  --color-state-entered: var(--state-entered);
+  --color-state-entered-soft: var(--state-entered-soft);
+  --color-state-conflict: var(--state-conflict);
+  --color-state-conflict-soft: var(--state-conflict-soft);
+  --color-state-settled: var(--state-settled);
+  --color-state-settled-soft: var(--state-settled-soft);
+
+  /* The hairline every rule in the product is drawn with. */
+  --color-rule: var(--rule);
+
+  /* ---- Type ramp ----------------------------------------------------
+   * Inter, tightened at the display sizes the way it wants to be and left
+   * alone at reading sizes. `caption` is the small label above a value:
+   * sentence case in the sans, not the wide uppercase monospace the first
+   * cut of this language set every label in. */
+  --text-display: 3rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.04em;
+  --text-h1: 2.125rem;
+  --text-h1--line-height: 1.12;
+  --text-h1--letter-spacing: -0.032em;
+  --text-h2: 1.625rem;
+  --text-h2--line-height: 1.2;
+  --text-h2--letter-spacing: -0.026em;
+  --text-title: 1.0625rem;
+  --text-title--line-height: 1.35;
+  --text-title--letter-spacing: -0.014em;
+  --text-lead: 1.0625rem;
+  --text-lead--line-height: 1.55;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+
+  /* ---- Motion -------------------------------------------------------
+   * One entrance, and it is short. */
+  --animate-rise: rise 0.24s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+
+  /* ---- Layout -------------------------------------------------------
+   * The height an evidence viewer gets when it is a page of its own. In
+   * the companion dock it fills the dock instead. */
+  --height-viewer: 70vh;
+  /* The dock's width when it opens, and the range a person may drag it
+   * to. The record keeps whatever is left.
+   *
+   * The opening width is set by the assistant, because the assistant is
+   * what the dock usually holds and it is the denser of the two panels. A
+   * proposal carries four lines -- the field, the reading with its unit,
+   * where it was read from, and the two decisions -- and at 26rem the
+   * decisions wrapped under the reading on most of them. 34rem stopped the
+   * wrapping, which was the bug, but it was still read as cramped: fitting
+   * a row is not the same as being comfortable to work in, and this panel
+   * is where a person spends the hour. 44rem is the answer to the second
+   * complaint rather than the first.
+   *
+   * The ceiling is 64rem rather than 46rem because a person reading a long
+   * answer wants the panel wide and the record narrow for that minute,
+   * and the old ceiling stopped them well short of it. The floor stays at
+   * 20rem, which is the width the composer needs. */
+  --width-dock: 44rem;
+  --width-dock-min: 20rem;
+  --width-dock-max: 64rem;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer base {
+  /* ---- Dark, which is the default ------------------------------------
+   *
+   * `:root` carries the dark palette, so a person who has chosen nothing
+   * gets it. These names are HeroUI's, and overriding them is what re-skins
+   * every HeroUI component at once: a Button, a Table and a Popover all
+   * speak Datum without a single component override.
+   */
+  :root,
+  .dark,
+  [data-theme="dark"] {
+    color-scheme: dark;
+
+    /* Geometry. HeroUI derives its whole radius scale from `--radius`, so
+     * this is the only place the product's corner is set. */
+    --radius: 0.25rem;
+    --field-radius: var(--radius);
+    --border-width: 1px;
+    /* HeroUI ships borderless fields. Datum draws every input, because an
+     * input is where a reading is entered and its edge is the control. */
+    --field-border-width: 1px;
+    --ring-offset-width: 2px;
+    --disabled-opacity: 0.4;
+
+    /* Ground and ink. Near-black carrying a little blue so the greys never
+     * go muddy, and a step of lightness between each surface rather than a
+     * shadow between them. */
+    --background: oklch(0.17 0.008 265);
+    --foreground: oklch(0.965 0.002 265);
+
+    --surface: oklch(0.205 0.009 265);
+    --surface-foreground: var(--foreground);
+    --surface-secondary: oklch(0.235 0.009 265);
+    --surface-secondary-foreground: var(--foreground);
+    --surface-tertiary: oklch(0.268 0.01 265);
+    --surface-tertiary-foreground: var(--foreground);
+
+    --overlay: oklch(0.228 0.01 265);
+    --overlay-foreground: var(--foreground);
+
+    --muted: oklch(0.672 0.012 265);
+
+    --border: oklch(0.288 0.01 265);
+    --separator: oklch(0.262 0.01 265);
+    --rule: oklch(0.288 0.01 265);
+
+    /* The one accent, and it is a plain blue that carries no brand. An
+     * engagement with a brand colour of its own replaces this value and the
+     * one in the light palette below, and nothing else.
+     *
+     * Focus, a primary action and a link. Never decoration. `entered` sits
+     * at a neighbouring hue, because it is the state a person creates by
+     * hand and it should read close to the product's own colour. */
+    --accent: oklch(0.7 0.11 240);
+    --accent-foreground: oklch(0.16 0.01 265);
+    --focus: var(--accent);
+    --link: var(--accent);
+
+    --default: oklch(0.268 0.01 265);
+    --default-foreground: var(--foreground);
+
+    --field-background: oklch(0.192 0.009 265);
+    --field-foreground: var(--foreground);
+    --field-placeholder: oklch(0.552 0.011 265);
+    --field-border: var(--rule);
+
+    /* HeroUI's status trio, pointed at the state colours that mean the
+     * same thing, so an Alert and a state pill never disagree. */
+    --success: oklch(0.745 0.13 160);
+    --success-foreground: oklch(0.16 0.01 265);
+    --warning: oklch(0.805 0.13 78);
+    --warning-foreground: oklch(0.16 0.01 265);
+    --danger: oklch(0.712 0.17 27);
+    --danger-foreground: oklch(0.16 0.01 265);
+
+    --segment: oklch(0.268 0.01 265);
+    --segment-foreground: var(--foreground);
+
+    --backdrop: oklch(0.11 0.008 265 / 0.66);
+
+    /* On a dark ground a surface is told apart by its own lightness, so
+     * only a thing that genuinely floats casts anything. */
+    --surface-shadow: none;
+    --overlay-shadow: 0 1px 2px oklch(0 0 0 / 0.4), 0 12px 32px oklch(0 0 0 / 0.5);
+    --field-shadow: none;
+
+    /* ---- The six states ----------------------------------------------
+     *
+     * Read them as a sequence rather than as six unrelated colours.
+     * Nothing recorded is neutral; blocked on a person is amber; the
+     * machine proposed it is violet; a person recorded it is blue, next to
+     * the accent; two sources disagree is red; signed off is green.
+     */
+    --state-open: oklch(0.685 0.014 265);
+    --state-open-soft: oklch(0.3 0.01 265);
+    --state-awaiting: oklch(0.8 0.13 78);
+    --state-awaiting-soft: oklch(0.32 0.055 72);
+    --state-inferred: oklch(0.75 0.16 300);
+    --state-inferred-soft: oklch(0.31 0.075 300);
+    --state-entered: oklch(0.755 0.115 232);
+    --state-entered-soft: oklch(0.31 0.055 232);
+    --state-conflict: oklch(0.71 0.17 27);
+    --state-conflict-soft: oklch(0.32 0.08 25);
+    --state-settled: oklch(0.74 0.13 160);
+    --state-settled-soft: oklch(0.3 0.06 160);
+  }
+
+  /* ---- Light, the bright counterpart -----------------------------------
+   *
+   * One job: be a clean, sharp, bright version of the same interface for
+   * anybody who wants one, and for reading a white document beside the
+   * record.
+   *
+   * The warmth is gone. The first cut of this language put light on a cream
+   * paper ground, and warm neutrals under a ruled grid is most of what made
+   * the product read as a drawing office. These greys carry the same faint
+   * blue the dark ones do and nothing else.
+   */
+  .light,
+  [data-theme="light"] {
+    color-scheme: light;
+
+    --background: oklch(0.985 0.001 265);
+    --foreground: oklch(0.22 0.012 265);
+
+    --surface: oklch(1 0 0);
+    --surface-foreground: var(--foreground);
+    --surface-secondary: oklch(0.972 0.002 265);
+    --surface-secondary-foreground: var(--foreground);
+    --surface-tertiary: oklch(0.948 0.003 265);
+    --surface-tertiary-foreground: var(--foreground);
+
+    --overlay: oklch(1 0 0);
+    --overlay-foreground: var(--foreground);
+
+    --muted: oklch(0.532 0.012 265);
+
+    --border: oklch(0.908 0.004 265);
+    --separator: oklch(0.935 0.003 265);
+    --rule: oklch(0.908 0.004 265);
+
+    /* The same blue, darkened enough to hold 4.5 to 1 as a link on a
+     * white page ground. */
+    --accent: oklch(0.462 0.1 240);
+    --accent-foreground: oklch(0.99 0.001 265);
+    --focus: var(--accent);
+    --link: var(--accent);
+
+    --default: oklch(0.948 0.003 265);
+    --default-foreground: var(--foreground);
+
+    --field-background: oklch(1 0 0);
+    --field-foreground: var(--foreground);
+    --field-placeholder: oklch(0.64 0.012 265);
+    --field-border: var(--rule);
+
+    --success: oklch(0.5 0.13 158);
+    --success-foreground: oklch(0.99 0.001 265);
+    --warning: oklch(0.53 0.13 72);
+    --warning-foreground: oklch(0.99 0.001 265);
+    --danger: oklch(0.545 0.21 27);
+    --danger-foreground: oklch(0.99 0.001 265);
+
+    --segment: oklch(1 0 0);
+    --segment-foreground: var(--foreground);
+
+    --backdrop: oklch(0.22 0.012 265 / 0.4);
+
+    /* A light ground has less lightness to spend separating surfaces, so a
+     * card gets the faintest lift and an overlay gets a real one. */
+    --surface-shadow: 0 1px 2px oklch(0.22 0.012 265 / 0.05);
+    --overlay-shadow: 0 1px 2px oklch(0.22 0.012 265 / 0.06),
+      0 12px 32px oklch(0.22 0.012 265 / 0.12);
+    --field-shadow: none;
+
+    --state-open: oklch(0.52 0.015 265);
+    --state-open-soft: oklch(0.955 0.004 265);
+    --state-awaiting: oklch(0.53 0.13 72);
+    --state-awaiting-soft: oklch(0.958 0.035 82);
+    --state-inferred: oklch(0.52 0.2 300);
+    --state-inferred-soft: oklch(0.958 0.03 300);
+    --state-entered: oklch(0.47 0.105 232);
+    --state-entered-soft: oklch(0.953 0.025 232);
+    --state-conflict: oklch(0.545 0.21 27);
+    --state-conflict-soft: oklch(0.955 0.032 25);
+    --state-settled: oklch(0.5 0.13 158);
+    --state-settled-soft: oklch(0.958 0.035 160);
+  }
+}

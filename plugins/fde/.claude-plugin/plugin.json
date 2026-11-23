@@ -1,0 +1,9 @@
+{
+  "name": "fde",
+  "version": "0.1.0",
+  "description": "The forward deployed engineering method, in two workbooks.",
+  "author": {
+    "name": "People Equation"
+  },
+  "repository": "https://github.com/Justanotherbrickinthewall/fde"
+}
