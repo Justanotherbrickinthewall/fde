@@ -153,7 +153,7 @@ milestone ids, an idea in the user's words, or an existing screen or file in
 4. **Never clobber.** Look under the prototype session folders for one
    ending `-<slug>` whose `Phase:` is short of `6 done`. If one exists, say
    which and resume from it.
-5. **The record.** Run `python3 ~/.claude/skills/sessions/scripts/sessions.py new --type prototype --slug <app>-<slug>`, or `--slug <slug>` where `apps` is empty. Run it from the umbrella. It chooses the folder and writes `notes.md` from the shared template. Follow `~/.claude/skills/sessions/SKILL.md` for the notes contract and the close step.
+5. **The record.** Run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" new --type prototype --slug <app>-<slug>`, or `--slug <slug>` where `apps` is empty. Run it from the umbrella. It chooses the folder and writes `notes.md` from the shared template. Follow `${CLAUDE_PLUGIN_ROOT}/sessions/CONTRACT.md` for the notes contract and the close step.
 6. **Extend `notes.md`.** Add the sections in the template below, set
    `Phase: 1 ground`, and write the starting point under **Starting point**
    in the user's own words.
@@ -290,7 +290,7 @@ gets a fresh session.
    `setup/planning-rules.md` § "Prototype rules", dated. Never in this file.
 5. **Lint and check links**, with the scripts the engagement carries in
    `<docs>/scripts/`, and fix what they find.
-6. **Close the record.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Run `python3 ~/.claude/skills/sessions/scripts/sessions.py check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 ~/.claude/skills/sessions/scripts/sessions.py index --write`.
+6. **Close the record.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" index --write`.
 7. **Set `Phase: 6 done`**, write the last **Progress log** line, and clear
    **Resume here** to say the session is finished. The closing message names
    the file, its final version, the known debt and every open question by id.

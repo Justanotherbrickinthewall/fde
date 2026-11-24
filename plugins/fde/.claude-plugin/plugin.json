@@ -1,6 +1,7 @@
 {
   "name": "fde",
-  "version": "0.1.0",
+  "version": "0.2.0",
+  "license": "MIT",
   "description": "Claude Code skills that run a forward deployed engineering engagement, from the first client call to a tested delivery.",
   "keywords": ["forward-deployed-engineering", "sessions", "qa", "testing", "client-delivery"],
   "homepage": "https://github.com/Justanotherbrickinthewall/fde",

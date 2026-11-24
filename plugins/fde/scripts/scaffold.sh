@@ -2,8 +2,9 @@
 # Builds an engagement's umbrella, its repositories and its .engagement file.
 #
 # Usage:
-#   scaffold.sh --slug <slug> --org <github-org> --umbrella <path> \
-#               --docs-template <owner/repo | local path> \
+#   scaffold.sh --slug <slug> --umbrella <path> \
+#               [--org <github-org>] \
+#               [--docs-template <owner/repo | local path>] \
 #               [--be <url | path | reference | none>] \
 #               [--fe <url | path | reference | none>]
 #
@@ -11,10 +12,14 @@
 # conversation; this script holds the mechanics, so the mechanics can be
 # tested without a conversation.
 #
+# --docs-template defaults to templates/docs inside the plugin. --org is
+# needed only when the docs template is written as owner/repo.
+#
 # What it does, in order:
 #
 #   1. Makes the umbrella folder if it is missing.
-#   2. Makes <slug>-docs from the docs template. A template written as
+#   2. Makes <slug>-docs from the docs template. With none given, the
+#      template bundled in the plugin is copied. A template written as
 #      owner/repo goes through `gh repo create --template --clone` when gh
 #      is signed in. A template that is a local directory is copied and
 #      `git init` runs in the copy.
@@ -51,7 +56,7 @@ script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 plugin_root="$(dirname "$script_dir")"
 
 usage() {
-    sed -n '2,32p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+    sed -n '2,37p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
 }
 
 die() {
@@ -73,9 +78,8 @@ while [ "$#" -gt 0 ]; do
 done
 
 [ -n "$slug" ] || die "--slug is required"
-[ -n "$org" ] || die "--org is required"
 [ -n "$umbrella" ] || die "--umbrella is required"
-[ -n "$docs_template" ] || die "--docs-template is required"
+[ -n "$docs_template" ] || docs_template="$plugin_root/templates/docs"
 
 case "$slug" in
     *[!a-z0-9-]*) die "the slug is lowercase letters, digits and dashes only" ;;
@@ -131,6 +135,7 @@ if [ -d "$docs_template" ]; then
     init_repo "$docs_dir"
     echo "$docs_name: copied from $docs_template, and git init ran in the copy"
 elif [[ "$docs_template" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
+    [ -n "$org" ] || die "--org is required when --docs-template is owner/repo"
     gh_ready || die "the template $docs_template is a GitHub repository and gh is not signed in"
     ( cd "$umbrella" && gh repo create "$org/$docs_name" --private --template "$docs_template" --clone >/dev/null )
     [ -d "$docs_dir" ] || die "gh repo create did not leave $docs_dir behind"

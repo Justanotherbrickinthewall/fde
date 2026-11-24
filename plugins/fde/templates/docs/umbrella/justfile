@@ -1,0 +1,106 @@
+# The umbrella. Every recipe runs from this directory, never from inside
+# one of the three repositories.
+#
+# The stack is `docker-compose.yml`, here beside this file. It `include:`s
+# the backend's own compose file, the frontend's, and the proxy fragment
+# in `fde-be/deploy/`, so everything is reached on http://localhost.
+# `/api/*` goes to Django and the rest goes to the bundle.
+#
+# No `-f` below, on purpose. Compose finds `docker-compose.yml` in the
+# directory it is started from, and every recipe here starts from this
+# one, so `docker compose up -d` typed by hand does the same thing
+# `just up` does.
+
+compose := "docker compose"
+
+# Show the recipes.
+default:
+    @just --list
+
+# Install both repositories' dependencies and arm both no-secrets hooks.
+setup: setup-be setup-fe
+
+# It installs into fde-be/.venv, and makes it first if it is missing.
+# A bare `pip` may belong to a newer Python than the one this repository
+# runs on, so the recipe uses the venv's own. The backend uses pre-commit,
+# which writes .git/hooks.
+
+# Install the backend and its hook.
+setup-be:
+    cd fde-be && { test -d .venv || python3.12 -m venv .venv; }
+    cd fde-be && .venv/bin/pip install -e '.[dev]'
+    cd fde-be && .venv/bin/pre-commit install
+
+# The frontend uses core.hooksPath instead. A linked worktree does not
+# share .git/hooks, so one config entry covers every worktree.
+
+# Install the frontend and its hook.
+setup-fe:
+    cd fde-fe && pnpm install && git config core.hooksPath .githooks
+
+# Leave the tools profile off and the test image goes stale while the
+# other images are rebuilt.
+
+# Build every image, the tools profile included.
+build:
+    {{compose}} --profile tools build
+
+# Start the stack: Postgres, Redis, migrations, Django, the worker, the bundle, the proxy.
+# Ports come from .env; see .env.example for the defaults.
+up:
+    {{compose}} up -d
+
+# Stop it. Volumes survive, so a seeded database is still there next time.
+down:
+    {{compose}} down
+
+# Follow the logs. `just logs be` follows one service.
+logs *args:
+    {{compose}} logs -f {{args}}
+
+# Run both suites.
+test: test-be test-fe
+
+# It runs against the test database on the compose Postgres. The host has
+# neither Redis nor Postgres on those ports, so the container is where the
+# dependencies actually are.
+
+# Run the backend suite, in a container.
+test-be:
+    {{compose}} --profile tools run --rm test
+
+# It runs on the host because the frontend compose file has no test service,
+# and because design-build.test.ts needs a real `vite build`. Run
+# `just setup-fe` first.
+
+# Run the frontend suite, on the host.
+test-fe:
+    cd fde-fe && pnpm -r test
+
+# The password comes from the environment, so it never reaches a file:
+#
+#   SEED_PASSWORD=secret just seed admin@fde.test "Admin Name"
+
+# Create a super admin. Set SEED_PASSWORD first.
+seed email name:
+    @test -n "${SEED_PASSWORD:-}" || { echo "Set SEED_PASSWORD first"; exit 1; }
+    {{compose}} --profile tools run --rm -e SEED_PASSWORD seed "{{email}}" "{{name}}"
+
+# Bring the stack up and print what a person needs to walk it.
+walk: up
+    @echo
+    @printf 'localhost/             %s\n' "$(curl -s -o /dev/null -w '%{http_code}' http://localhost/)"
+    @printf 'localhost/api/schema/  %s\n' "$(curl -s -o /dev/null -w '%{http_code}' http://localhost/api/schema/)"
+    @echo
+    @echo 'Both must read 200 before you hand the URL over.'
+    @echo
+    @echo 'Sign in at  http://localhost/sign-in'
+    @echo
+    @echo 'Seed the first account, then prove it from the shell:'
+    @echo
+    @echo '  SEED_PASSWORD=password just seed admin@fde.test "Admin Name"'
+    @echo '  curl -i -X POST http://localhost/api/sign-in \'
+    @echo '    -H "Content-Type: application/json" \'
+    @echo '    -d "{\"email\":\"admin@fde.test\",\"password\":\"password\"}"'
+    @echo
+    @echo 'A 200 with a Set-Cookie passes. Findings go in my-sessions/.'

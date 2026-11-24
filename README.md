@@ -115,22 +115,20 @@ Four rules keep the evidence honest.
 
 The loop follows Arpit Choubey's article [Claude Code for QA: From Writing Test Cases to Building an AI-Powered Testing Workflow](https://medium.com/@ArpitChoubey9/claude-code-for-qa-from-writing-test-cases-to-building-an-ai-powered-testing-workflow-436d12b37696).
 
-## Running a full engagement needs six things this repository does not carry
+## The plugin carries its docs template and session script, and four things sit outside it
 
-Every skill can be read here. Running one needs the things below. Three of them are private today: the default docs template, the reference stacks and the `sessions` skill.
+An outside engineer can install the plugin and start an engagement with nothing else. `fde:init` copies the docs template from [`plugins/fde/templates/docs`](./plugins/fde/templates/docs), so the docs repository starts local with no remote. The skills cite numbered guardrails, and the template's `setup/guardrails.md` holds them. The session skills call the script in [`plugins/fde/sessions`](./plugins/fde/sessions), which uses only the Python standard library.
 
-So an outside engineer can read the whole method now. Running a session means supplying a docs template and a session scaffold of their own.
+Each thing below sits outside this repository. It is needed only by the skill that names it.
 
-1. A docs template repository and the guardrails it defines. `fde:init` builds the docs repository from it, and the default template is private. The skills cite numbered guardrails, and the template's `setup/guardrails.md` holds them. `--docs-template` takes another template.
-2. The reference stacks `PeopleEquation/fde-be` (Django and DRF) and `PeopleEquation/fde-fe` (React and Vite). Both are private and optional. They affect `fde:init`.
-3. The `sessions` skill at `~/.claude/skills/sessions`. The session skills call its `sessions.py` to make, check and index session folders. It is not published yet.
-4. The superpowers plugin. The default method pack of `fde:aie-session` uses it.
-5. Two voice files for `fde:explain`: `~/.claude-shared/VOICE.md` and `~/.claude-shared/registers/learner.md`.
-6. Outside tools for the lanes of `fde:qa-session`. Each is installed only if its lane runs. They are the Postman plugin, `@playwright/test` in the frontend and the `claude-security` plugin.
+1. The reference stacks `PeopleEquation/fde-be` (Django and DRF) and `PeopleEquation/fde-fe` (React and Vite). Both are private. Answer `none` in `fde:init`, or bring your own repositories.
+2. The superpowers plugin. The default method pack of `fde:aie-session` uses it.
+3. Two voice files for `fde:explain`: `~/.claude-shared/VOICE.md` and `~/.claude-shared/registers/learner.md`.
+4. Outside tools for the lanes of `fde:qa-session`. Each is installed only if its lane runs. They are the Postman plugin, `@playwright/test` in the frontend and the `claude-security` plugin.
 
 ## Status
 
-The plugin is at version 0.1.0.
+The plugin is at version 0.2.0. Its licence is MIT, and the text is in [`LICENSE`](./LICENSE).
 
 The method comes from daily client work. This plugin is the general version of that method, with the client's names and rules taken out. Its first full client engagement as a plugin is still ahead.
 
@@ -138,12 +136,13 @@ These points say what is proven and what is not.
 
 1. `fde:qa-session` is new. None of its four lanes has been run in a real session yet.
 2. The plugin assumes a Django and React reference stack in places. Some convention files are written for Vitest, Tailwind, HeroUI, Django and pytest.
-3. `fde:init` cannot run without a docs template, and the default one is private.
+3. The bundled docs template and session script have each run only in a scratch folder. No full `fde:init` or session has yet run from a marketplace install.
 4. Only one method pack exists for `fde:fdc-session` and two for `fde:aie-session`.
 
 ## The repository holds one marketplace and one plugin
 
 ```
+LICENSE                           the MIT licence
 .claude-plugin/marketplace.json   the catalogue that the install command reads
 install.sh                        links the plugin into ~/.claude/skills
 plugins/fde/
@@ -151,7 +150,9 @@ plugins/fde/
   README.md                       the full reference
   ENGAGEMENT.md                   the format of the .engagement file
   scripts/                        the scaffold, record lint and link check scripts
+  sessions/                       the session script, its notes template and its contract
   skills/                         one folder per skill, each with a SKILL.md
+  templates/docs/                 the docs template that fde:init copies
 ```
 
 ## Working on the skills

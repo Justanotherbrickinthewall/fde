@@ -181,13 +181,13 @@ from the user's own words.
    `--root <umbrella>`:
 
    ```bash
-   python3 ~/.claude/skills/sessions/scripts/sessions.py new --type qa --slug <slug>
+   python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" new --type qa --slug <slug>
    ```
 
    With a milestone the slug is `<milestone>-<slug>`. With none it is
    `<slug>` alone. The script chooses the folder path, which is
    `my-sessions/qa/<date>-<slug>/`, and writes `notes.md` from the shared
-   template. Follow `~/.claude/skills/sessions/SKILL.md` for the notes
+   template. Follow `${CLAUDE_PLUGIN_ROOT}/sessions/CONTRACT.md` for the notes
    contract and the close step. If a folder with that slug exists, resume it.
 4. **Fill the front block.** Set the fields listed under "notes.md fields",
    and `Phase: 1 facts`.
@@ -650,7 +650,7 @@ work, and the next one gets a fresh session.
 
    Do not change the milestone's status. QA does not decide that a milestone
    is delivered.
-8. **Set the front fields and check them.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Use `blocked` only inside `Owes`. Then run `python3 ~/.claude/skills/sessions/scripts/sessions.py check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 ~/.claude/skills/sessions/scripts/sessions.py index --write`.
+8. **Set the front fields and check them.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Use `blocked` only inside `Owes`. Then run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" index --write`.
 
    The Summary carries the counts and the review status, such as: "41 facts:
    36 pass, 3 fail, 2 not checked. 118 test cases, 4 lanes. Reviewed by a

@@ -9,7 +9,7 @@
       "name": "fde",
       "description": "Claude Code skills that run a forward deployed engineering engagement, from the first client call to a tested delivery.",
       "source": "./plugins/fde",
-      "version": "0.1.0"
+      "version": "0.2.0"
     }
   ]
 }

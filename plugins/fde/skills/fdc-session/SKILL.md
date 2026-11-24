@@ -242,7 +242,7 @@ If the user gave no detail, ask one short question and then proceed.
 
 2. **Find or create the session folder.** Look in `my-sessions/INDEX.md`, under Active, for an open `fdc` row. If there is one, reuse that folder and say so. Read its `Phase:` marker and resume from there, rather than starting at phase 1. A folder with no marker starts at phase 1.
 
-   Only when there is no open row, run `python3 ~/.claude/skills/sessions/scripts/sessions.py new --type fdc --slug <slug>`. It chooses the session folder path and the folder name, and writes `notes.md` from the shared template. Follow `~/.claude/skills/sessions/SKILL.md` for the notes contract and the close step.
+   Only when there is no open row, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" new --type fdc --slug <slug>`. It chooses the session folder path and the folder name, and writes `notes.md` from the shared template. Follow `${CLAUDE_PLUGIN_ROOT}/sessions/CONTRACT.md` for the notes contract and the close step.
 
 4. **Fill the front block.** Set what arrived, the detail, the method and `Phase: 1 read`, using the FDC fields listed under "notes.md fields" below.
 
@@ -343,13 +343,13 @@ It checks six things:
 
 It exits non-zero on a finding.
 
-When the engagement has a knowledge folder, also run, beside `lint_record.py`:
+When the engagement has a knowledge folder and `~/.claude/skills/sessions/scripts/wiki_lint.py` exists, also run, beside `lint_record.py`:
 
 ```bash
 python3 ~/.claude/skills/sessions/scripts/wiki_lint.py --knowledge <path>
 ```
 
-Treat its findings the same way as the record lint's.
+Treat its findings the same way as the record lint's. Where the script does not exist, skip it and write one line in `notes.md` that says the wiki lint was skipped because the script is not installed.
 
 Every finding is fixed in this session or written into `notes.md` with the
 reason it stands. A finding left silent is a finding that will be inherited.
@@ -379,7 +379,7 @@ write to the record.
 3. **Write `handoff-<who>.md`** only where something has to reach a person the
    record does not reach. Most sessions do not need one.
 
-4. **Set the front fields and check them.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Use `blocked` only inside `Owes`. Then run `python3 ~/.claude/skills/sessions/scripts/sessions.py check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 ~/.claude/skills/sessions/scripts/sessions.py index --write`.
+4. **Set the front fields and check them.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Use `blocked` only inside `Owes`. Then run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" index --write`.
 
 5. **Set `Phase: 7 done`**, write the last **Progress log** line, and clear
    **▶ Resume here** to say the session is finished.

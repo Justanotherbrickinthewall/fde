@@ -464,13 +464,13 @@ only when a milestone was given, and the others run as written.
    `--root <umbrella>`:
 
    ```bash
-   python3 ~/.claude/skills/sessions/scripts/sessions.py new --type aie --slug <slug>
+   python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" new --type aie --slug <slug>
    ```
 
    With a milestone the slug is `<milestone>-<slug>`. With none it is
    `<slug>` alone. The script chooses the session folder path and the folder
    name, and writes `notes.md` from the shared template. Follow
-   `~/.claude/skills/sessions/SKILL.md` for the notes contract and the close
+   `${CLAUDE_PLUGIN_ROOT}/sessions/CONTRACT.md` for the notes contract and the close
    step. If a folder with that slug already exists, resume it rather than
    scaffolding a second one.
 
@@ -1251,7 +1251,7 @@ Reached only once phase 7 has ended, including any second pass it chose.
    resolves, an open question with no owner, a guardrail with no source. A
    finding that belongs to the FDC's half of the record goes to them by name,
    and `notes.md` says so. The session does not close on a red lint.
-10. **Set the front fields and check them.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Use `blocked` only inside `Owes`. Then run `python3 ~/.claude/skills/sessions/scripts/sessions.py check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 ~/.claude/skills/sessions/scripts/sessions.py index --write`.
+10. **Set the front fields and check them.** Set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Use `blocked` only inside `Owes`. Then run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" index --write`.
 11. **Set `Phase: 8 done`**, write the last **Progress log** line, and clear
     **▶ Resume here** to say the session is finished. The closing message
     names every **For the user** item. The walk has run as part of this

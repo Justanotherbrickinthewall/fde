@@ -117,7 +117,7 @@ losing the context the user gives it.
 
 ## Phase 0: scaffold
 
-1. **The folder.** Run `python3 ~/.claude/skills/sessions/scripts/sessions.py new --type hardening --slug <app>-<name>`, from the umbrella, with no app in the slug where `apps` is empty. It chooses the folder path and writes `notes.md` from the shared template. Follow `~/.claude/skills/sessions/SKILL.md` for the notes contract and the close step.
+1. **The folder.** Run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" new --type hardening --slug <app>-<name>`, from the umbrella, with no app in the slug where `apps` is empty. It chooses the folder path and writes `notes.md` from the shared template. Follow `${CLAUDE_PLUGIN_ROOT}/sessions/CONTRACT.md` for the notes contract and the close step.
 
    Never clobber. First look in the `hardening` sessions folder for a folder ending `-<name>` whose `notes.md` has `Phase:` short of `2 done`. A fresh session on a later day computes a different date, so match on the name. If one exists, say which, skip the rest of this phase, and resume from it.
 
@@ -258,7 +258,7 @@ The session ends after this merge. It never takes on a second hunt or a mileston
 
 Then merge the backend into the base, push, and tell the user the commit. Then the frontend. Then revert `localhost` to the primary checkouts using `revert.md`, restart the containers, repeat the health checks, and remove the hunt's worktrees. Teardown also removes each lane's volumes and test image with `docker compose -p <project> down -v --rmi local`. Set `Phase: 2 done`, write the last Progress log line, and clear Resume here to say the hunt is finished.
 
-At the close step, set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Then run `python3 ~/.claude/skills/sessions/scripts/sessions.py check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 ~/.claude/skills/sessions/scripts/sessions.py index --write`.
+At the close step, set `Status: done`, write `Summary:` in one line, and set `Owes:` to what is still owed, or `none`. Then run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" index --write`.
 
 Check what your green actually ran. The test service may run the test runner alone, while CI also runs the linter, the framework's own check, the migration check and the schema checks. Name the command beside every green.
 

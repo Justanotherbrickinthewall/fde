@@ -180,11 +180,11 @@ It reads no engagement file and works in any project. It writes to chat and edit
 
 ## A session is a folder with a phase marker and gates
 
-Most skills run as a session. A session is a folder at `my-sessions/<type>/<DDMMYY>-<slug>/`, made by `sessions.py new --type <type> --slug <slug>`. The types the skills use are `aie`, `fdc`, `smoke`, `qa`, `misc`, `prototype` and `hardening`.
+Most skills run as a session. A session is a folder at `my-sessions/<type>/<ddmmmyy>-<slug>/`, such as `my-sessions/qa/24nov26-login/`, made by the bundled script `sessions/scripts/sessions.py new --type <type> --slug <slug>`. The types the skills use are `aie`, `fdc`, `smoke`, `qa`, `misc`, `prototype` and `hardening`.
 
 `my-sessions` sits beside the repositories and has no git. `fde:init` links it to `~/.claude-shared/records/<slug>/` when that folder exists. The record in `<docs>` never links to a session.
 
-Every folder holds a `notes.md`. Its front fields include `Status` (`active`, `paused` or `done`), `Summary` and `Owes`. Each skill adds its own, such as `Milestone`, `Method`, `Flags`, `Repositories` and `Branch` for `fde:aie-session`. A session closes with `sessions.py check <folder>` and then `sessions.py index --write`.
+Every folder holds a `notes.md`. Its front fields include `Status` (`active`, `paused` or `done`), `Summary` and `Owes`. Each skill adds its own, such as `Milestone`, `Method`, `Flags`, `Repositories` and `Branch` for `fde:aie-session`. A session closes with `sessions.py check <folder>` and then `sessions.py index --write`. The notes contract is `sessions/CONTRACT.md`.
 
 The `Phase:` field in `notes.md` is the phase marker, and `▶ Resume here` names the single next action. A skill updates both the moment a phase ends. Start the skill again and it reads the marker and carries on, so a closed chat loses nothing.
 
@@ -285,24 +285,27 @@ Adopting a convention means its checklist becomes a gate. Phase 8 of `fde:aie-se
 | `lint_record.py` | Checks milestone status, `waits-on`, `delivery:`, the parts of a `ready` milestone, open-question owners, guardrail sources and unlinked pages |
 | `check_links.py` | Fails on any relative link in the record that points at a missing file |
 | `no-secrets` | A commit hook that refuses a staged OpenRouter key and nothing else |
-| `test_check_links.py`, `test_lint_record.py` | Tests for the two checkers |
+| `test_check_links.py`, `test_lint_record.py`, `test_scaffold.py` | Tests for the two checkers and for `scaffold.sh` |
 
 `lint_record.py` takes the docs root and an optional record root for an app. `check_links.py` takes the docs root. Both default to the working directory.
+
+`sessions/` holds the bundled session script. `sessions/scripts/sessions.py` makes, checks and indexes session folders, `sessions/scripts/memlib.py` supports it, `sessions/templates/notes.md` is the notes template and `sessions/CONTRACT.md` is the notes contract. `sessions/tests/test_sessions.py` tests it. The script uses only the Python standard library and writes only inside the project's `my-sessions/` folder.
+
+`templates/docs/` is the bundled docs template. `scaffold.sh` copies it to `<slug>-docs` when no other template is named.
 
 `skills/file/scripts/` holds the capture machinery that `fde:file` uses: `pdfspec.py`, `rtfgrid.py` and `coverage.py`. Per-document driver scripts are engagement work and live in `<docs>/scripts/`.
 
 ## What the plugin needs from outside this repository
 
-The plugin cannot run on its own. Each item below sits outside it.
+The plugin bundles its docs template and its session script. `fde:init` builds `<slug>-docs` from the template at `templates/docs`, and the docs repository starts local with no remote. `scaffold.sh --docs-template` still takes another template, as `owner/repo` or a local path. Each item below sits outside the plugin.
 
-1. A docs template repository. `fde:init` builds `<slug>-docs` from it. The default is `PeopleEquation/fde-docs`, which is private. `scaffold.sh --docs-template` takes another, as `owner/repo` or a local path.
-2. `gh`, signed in, when the docs template is written as `owner/repo`.
-3. Optional reference stacks. `PeopleEquation/fde-be` is Django and DRF, and `PeopleEquation/fde-fe` is React and Vite. Both are private and neither is part of the method.
-4. The `sessions` skill at `~/.claude/skills/sessions`. The session skills call its `scripts/sessions.py` to make, check and index session folders.
-5. The superpowers skills, for the default `superpowers` pack.
-6. Two voice files for `fde:explain`: `~/.claude-shared/VOICE.md` and `~/.claude-shared/registers/learner.md`.
-7. The QA lanes' tools, each needed only if its lane runs. For `postman`, run `claude plugin marketplace add anthropics/claude-plugins-official` and then `claude plugin install postman@claude-plugins-official`. For `playwright`, `@playwright/test` must already be in the frontend. For the deeper scan in `anthropic`, run `/plugin install claude-security@claude-plugins-official` and then `/reload-plugins`. The `sql` lane needs no install.
-8. Files in the docs template that the skills read by name: `setup/guardrails.md`, `setup/planning-rules.md`, `setup/filing-rules.md`, `setup/scoping-rules.md`, `setup/artifact-templates.md` and `project/brain-dumps/README.md`.
+1. `gh`, signed in, and `--org`. Both are needed only when a docs template is named as `owner/repo`.
+2. Optional reference stacks. `PeopleEquation/fde-be` is Django and DRF, and `PeopleEquation/fde-fe` is React and Vite. Both are private and neither is part of the method.
+3. Optionally, the full `sessions` skill at `~/.claude/skills/sessions`. Where it is installed, the bundled script hands every command to it, and `fde:fdc-session` also runs its wiki lint.
+4. The superpowers skills, for the default `superpowers` pack.
+5. Two voice files for `fde:explain`: `~/.claude-shared/VOICE.md` and `~/.claude-shared/registers/learner.md`.
+6. The QA lanes' tools, each needed only if its lane runs. For `postman`, run `claude plugin marketplace add anthropics/claude-plugins-official` and then `claude plugin install postman@claude-plugins-official`. For `playwright`, `@playwright/test` must already be in the frontend. For the deeper scan in `anthropic`, run `/plugin install claude-security@claude-plugins-official` and then `/reload-plugins`. The `sql` lane needs no install.
+7. A replacement docs template should start as a copy of `templates/docs`, because the skills read many of its files by name. Examples are `setup/guardrails.md`, `setup/planning-rules.md`, `setup/filing-rules.md`, `setup/scoping-rules.md`, `setup/artifact-templates.md` and `project/brain-dumps/README.md`.
 
 ## Install and versions
 
@@ -328,14 +331,14 @@ The second route is for someone who edits the skills. Clone the repository and r
 
 Use one route and never both. Both together list every skill twice.
 
-`.engagement` records the version the engagement started on, as `plugin_version`. Do not pull mid-milestone, because a skill that changes under a running build invalidates the record it just wrote. The plugin is at version 0.1.0.
+`.engagement` records the version the engagement started on, as `plugin_version`. Do not pull mid-milestone, because a skill that changes under a running build invalidates the record it just wrote. The plugin is at version 0.2.0. Its licence is MIT, and the text is in `LICENSE`.
 
 ## Limits
 
 These are the gaps the files show.
 
-1. The numbered guardrails are defined in the docs template's `setup/guardrails.md`, not here. The skills cite them by number, and this repository cannot say what they contain. `lint_record.py` checks only that each live guardrail has a `Source:` line.
-2. `fde:init` cannot run end to end without a docs template. `PeopleEquation/fde-docs` is private, so an outside engineer must supply their own and match the files in item 8 of the section above.
+1. The numbered guardrails are defined in the docs template's `setup/guardrails.md`, and the bundled copy is `templates/docs/setup/guardrails.md`. The skills cite them by number. `lint_record.py` checks only that each live guardrail has a `Source:` line.
+2. The bundled session script and the bundled docs template have each been run only in a scratch folder. No full `fde:init` or session has yet run from a marketplace install.
 3. The `--afk` rule and the subagent-model rule live in the user's global `CLAUDE.md`. The plugin cites them and does not carry them.
 4. `fde:qa-session` is new, and none of its four lanes has been run in a real session. Their commands come from the tools' own documents.
 5. The `playwright` lane runs only if the frontend already uses `@playwright/test`. Adding a test framework is the person's decision, and under `--afk` the lane reports `not installed` and stops.
@@ -347,4 +350,6 @@ These are the gaps the files show.
 11. `fde:file` marks the ledger row of a binary it cannot read, such as dwg, as blocked and needing conversion. `rtfgrid.py` depends on `textutil` output.
 12. The checklist in the repo-layout convention says `.engagement` carries seven fields. `ENGAGEMENT.md` defines thirteen, so that checklist item is out of date.
 13. The files do not say what `fde:explain` does when its voice files are missing.
-14. Neither marketplace command has been run against this repository yet. `claude plugin validate` passes for the plugin and for the marketplace.
+14. The reference stacks are still private, so an outside engineer brings their own repositories or answers none.
+15. The wiki lint in `fde:fdc-session` runs only where the full `sessions` skill is installed. Elsewhere the skill skips it and writes one line in `notes.md`.
+16. Neither marketplace command has been run against this repository yet. `claude plugin validate` passes for the plugin and for the marketplace.

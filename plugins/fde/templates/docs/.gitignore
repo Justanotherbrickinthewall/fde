@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.env
+.pytest_cache/
+.DS_Store
+
+# Client material. Never pushed to a remote. Guardrail 5 is why.
+raw/
+
+# Session records live in the sibling folder my-sessions, never here.
+sessions/

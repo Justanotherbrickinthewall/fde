@@ -64,14 +64,13 @@ expect a no.
 
 ## Phase 1 — Scaffold
 
-### Ask four things
+### Ask three things
 
 Ask them together, in one short message, and wait.
 
 1. The slug, unless it came in with the command.
-2. The GitHub organisation the new repositories belong to.
-3. Whether a backend repository already exists.
-4. Whether a frontend repository already exists.
+2. Whether a backend repository already exists.
+3. Whether a frontend repository already exists.
 
 For the backend and the frontend, offer the same three answers:
 
@@ -94,28 +93,33 @@ The mechanics are one script, so nothing here depends on your typing:
 ```bash
 "${CLAUDE_PLUGIN_ROOT}/scripts/scaffold.sh" \
   --slug <slug> \
-  --org <org> \
   --umbrella <path> \
-  --docs-template PeopleEquation/fde-docs \
   --be <url | path | reference | none> \
   --fe <url | path | reference | none>
 ```
 
-The docs template is `PeopleEquation/fde-docs` unless the user names
-another. A template written as `owner/repo` goes through
-`gh repo create --template --clone`, so `gh` has to be signed in. A local
-path is copied and `git init` runs in the copy.
+With no `--docs-template`, the script uses the template bundled at
+`${CLAUDE_PLUGIN_ROOT}/templates/docs`. It copies the template and runs
+`git init` in the copy, so the docs repository starts local with no remote.
+When the user names another template, pass `--docs-template <owner/repo | path>`.
+A template written as `owner/repo` goes through `gh repo create --template --clone`,
+so `gh` has to be signed in. In that case, ask for the GitHub organisation the
+new repository belongs to, and pass it as `--org <org>`.
 
 The script makes the umbrella and then `<slug>-docs` from the template. It
 places the code repositories you asked for. It renames every `fde-docs`,
 `fde-be`, `fde-fe` and `fde-os` inside the docs repository. Then it writes
 `.engagement` with `stack=` empty and makes `my-sessions/`. When
 `~/.claude-shared` exists, `my-sessions` is a link to
-`~/.claude-shared/records/<slug>/`. Otherwise it is a plain folder. The script
-writes `<docs>/umbrella/CLAUDE.md` as a map of the repositories, and a stub
-`CLAUDE.md` in each code repository that links `BRANCHING.md`. It never
-overwrites a `CLAUDE.md` that exists. Last it runs `bootstrap.sh`. It prints
-one line per step.
+`~/.claude-shared/records/<slug>/`. Otherwise it is a plain folder. The
+bundled template ships `<docs>/umbrella/CLAUDE.md`, a map of the repositories,
+and the script keeps it. For a template with no such file, the script writes
+one. It also writes a stub `CLAUDE.md` in each code repository that links
+`BRANCHING.md`. It never overwrites a `CLAUDE.md` that exists. Last it runs
+`bootstrap.sh`. It prints one line per step.
+
+The bundled map names a backend and a frontend. If either was answered `none`,
+edit `<docs>/umbrella/CLAUDE.md` so it says that repository does not exist yet.
 
 It refuses to overwrite an existing `<slug>-docs`. If it stops there, the
 engagement was already scaffolded, so read `.engagement` and go to phase 2.
@@ -168,7 +172,7 @@ not a build, and a milestone still has to make it work.
 
 ### setup/conventions.md
 
-The file does not ship in the template, so phase 2 creates it. It carries a
+The template ships the file as a header with no rows, so phase 2 fills it in. It carries a
 short header and one table with five columns.
 
 ```markdown

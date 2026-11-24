@@ -127,7 +127,7 @@ Open it before the first scenario, not after the first finding. Say so
 in one line and move on.
 
 Findings always go in `my-sessions`, whichever repository the fault is
-in. They never go in `<docs>`. Run `python3 ~/.claude/skills/sessions/scripts/sessions.py new --type smoke --slug <slug>`. It chooses the session folder path and the folder name, and writes `notes.md` from the shared template. Follow `~/.claude/skills/sessions/SKILL.md` for the notes contract and the close step.
+in. They never go in `<docs>`. Run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" new --type smoke --slug <slug>`. It chooses the session folder path and the folder name, and writes `notes.md` from the shared template. Follow `${CLAUDE_PLUGIN_ROOT}/sessions/CONTRACT.md` for the notes contract and the close step.
 
 The findings file is `bugs-and-improvements.md` inside the folder
 `sessions.py` created.
@@ -358,7 +358,7 @@ that share a cause, because they are one piece of work.
 
 Do not fix any of it here. Do not open a branch.
 
-At the close step, set the front fields in `notes.md` and check them. Set `Status: done`, write `Summary:` in one line, and set `Owes:` to a bug hunt that names the findings file, for example `Owes: bug hunt on bugs-and-improvements.md`. Use `blocked` only inside `Owes`. Then run `python3 ~/.claude/skills/sessions/scripts/sessions.py check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 ~/.claude/skills/sessions/scripts/sessions.py index --write`.
+At the close step, set the front fields in `notes.md` and check them. Set `Status: done`, write `Summary:` in one line, and set `Owes:` to a bug hunt that names the findings file, for example `Owes: bug hunt on bugs-and-improvements.md`. Use `blocked` only inside `Owes`. Then run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" check <folder>`. If it exits non-zero, fix the notes and run it again. When it passes, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" index --write`.
 
 Then hand the file over and stop. End on the hand-over. Do not offer a menu of next steps or offer to start any fix, because that work belongs to the bug hunt named in `Owes:`.
 

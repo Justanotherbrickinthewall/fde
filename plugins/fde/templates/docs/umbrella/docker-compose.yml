@@ -1,0 +1,49 @@
+# The whole stack, all three parts, behind one origin.
+#
+#   docker compose up -d
+#
+# Then http://localhost is the application. `/api/*` reaches Django and
+# everything else reaches the frontend. That is decision 8 of ADR-001 -- one
+# origin at the edge, so the session cookie is a same-origin cookie and a
+# file download is an ordinary link.
+#
+# This file sits at the umbrella, beside `justfile` and `CLAUDE.md`, and
+# like them it is untracked. That is deliberate and it is why the file
+# is this short. It owns nothing. The three `include:`s below are the
+# whole content, and every one of them points into a repository that is
+# tracked, so losing this file costs five lines rather than the stack.
+#
+# The production overlay is a second file, and it is applied from here:
+#
+#   docker compose -f docker-compose.yml \
+#     -f fde-be/deploy/compose.prod.yml up -d
+#
+# The project name matches the backend's own, deliberately. One name
+# means one network, one set of volumes and one set of containers, so
+# `docker compose up` in `fde-be/` and `up` here are two doors into
+# the same stack rather than two stacks fighting over ports 5433, 6380
+# and 8000. Compose will call `fe` and `proxy` orphans when you run the
+# backend's file on its own; that is a warning and it is accurate.
+
+name: fde-os
+
+# Each included file's own relative paths resolve against its own
+# directory, not this one. So `./deploy/db-init` in the backend's file
+# still means the backend's, and `./proxy/Caddyfile` in `proxy.yml`
+# still means `fde-be/deploy/proxy/`.
+#
+# An included service cannot be overridden from this file -- compose
+# rejects a `be:` or `fe:` block here as a conflict with an imported
+# resource. Anything either service needs from the umbrella therefore
+# arrives as a variable that file already reads, out of `.env` here.
+include:
+  - path: fde-be/docker-compose.yml
+  - path: fde-be/deploy/proxy.yml
+  - path: fde-fe/docker-compose.yml
+
+# CSRF_TRUSTED_ORIGINS is deliberately not set anywhere here. Django only
+# checks the referer against it when the request is HTTPS, and this proxy
+# speaks http, so today it would change nothing. Whoever puts TLS in
+# front of this proxy sets it in the backend's `.env`, as a
+# scheme-and-host origin, and turns SESSION_HTTPS_ONLY on in the same
+# move.

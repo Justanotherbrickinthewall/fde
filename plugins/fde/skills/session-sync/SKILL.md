@@ -78,15 +78,15 @@ has been processed:
 record that already existed, and nothing was rewritten. `skipped` means
 trivial, deliberately no record.
 
-**Naming.** The sessions skill owns the layout. Every record is a folder,
+**Naming.** The sessions contract owns the layout. Every record is a folder,
 `my-sessions/<type>/<DDMMYY>-<slug>/`, with `notes.md` inside, such as
 `my-sessions/smoke/07nov26-m02-api-walk/`. The type is `aie`, `fdc`, `smoke`
-or `misc`. The sessions skill has no single-file misc note, so misc work gets
-a folder too. Run `python3 ~/.claude/skills/sessions/scripts/sessions.py root`
+or `misc`. The sessions contract has no single-file misc note, so misc work gets
+a folder too. Run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" root`
 to find the sessions root, and never build a path by hand. `sessions.py new`
 picks the folder name from the date the script runs. Rename nothing to force
 the chat's start date. Put that date in `Started:`.
-`~/.claude/skills/sessions/SKILL.md` holds the notes contract. Old-layout
+`${CLAUDE_PLUGIN_ROOT}/sessions/CONTRACT.md` holds the notes contract. Old-layout
 folders, `my-sessions/<milestone>-<slug>-<DDMMYY>/` and
 `my-sessions/misc/<slug>-<DDMMYY>.md`, still exist. Read them, link to them,
 and never rename or move them.
@@ -157,7 +157,7 @@ and never rename or move them.
      folder, or in an old-layout folder → append a dated line to its `notes.md` progress log and bump
      `Last updated:`. Never clobber. Ledger `linked`.
    - **Substantive, milestone known, no folder** → run
-     `python3 ~/.claude/skills/sessions/scripts/sessions.py new --type <type> --slug <milestone>-<slug>`,
+     `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" new --type <type> --slug <milestone>-<slug>`,
      then fill the `notes.md` it writes from `did` and `engagement_trail`. Set
      `Started:` to the chat's start date. Ledger `recorded`.
    - **Substantive, milestone ambiguous** → ask the user which one, showing
@@ -179,9 +179,9 @@ and never rename or move them.
    - Never overwrite an existing `notes.md`. Append, or create alongside.
 
 6. **Close the folders.** For every folder this run created or appended to,
-   run `python3 ~/.claude/skills/sessions/scripts/sessions.py check <folder>`.
+   run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" check <folder>`.
    If it exits non-zero, fix the notes and run it again. When every folder
-   passes, run `python3 ~/.claude/skills/sessions/scripts/sessions.py index --write`.
+   passes, run `python3 "${CLAUDE_PLUGIN_ROOT}/sessions/scripts/sessions.py" index --write`.
 
 7. **Persist the ledger** with every candidate's outcome and `last_run`,
    then print a table: transcript short uuid, date, action, folder, one-line
